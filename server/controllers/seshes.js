@@ -1,4 +1,5 @@
-var Sesh = require('../models/sesh.js');
+var Sesh = require('../models/sesh.js'),
+    User = require('../models/user.js');
 
 module.exports = {
     getAll: function(req, res) {
@@ -33,19 +34,29 @@ module.exports = {
     },
     
     create: function(req, res) {
-        let inc_sesh = req.body;
-        let sesh = new Sesh(inc_sesh);
-        sesh.save(function(error) {
+        let inc_user = req.body['user']
+        let inc_sesh = req.body['sesh'];
+        let user = new User(inc_user);
+        user.save(function(error) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
-                let response = {
-                    message: "Success",
-                    sesh: sesh
-                };
-                res.json(response);
-            };
+                inc_sesh.organizer = user;
+                let sesh = new Sesh(inc_sesh);
+                sesh.save(function(error) {
+                    if (error) {
+                        console.log("There was an issue: ", error);
+                        res.json(error);
+                    } else {
+                        let response = {
+                            message: "Success",
+                            sesh: sesh
+                        };
+                        res.json(response);
+                    };
+                });
+            }
         });
     },
 
@@ -91,6 +102,30 @@ module.exports = {
                     message: "Success"
                 };
                 res.json(response);
+            };
+        });
+    },
+
+    addAttendee: function(req, res) {
+        let sid = req.params.id;
+        let inc_user = req.body;
+        let user = new User(inc_user);
+        user.save(function(error) {
+            if (error) {
+                console.log("There was an issue: ", error);
+                res.json(error);
+            } else {
+                Sesh.update({_id: sid}, {$push: {attendees: user}}, function(error) {
+                    if (error) {
+                        console.log("There was an issue: ", error);
+                        res.json(error);
+                    } else {
+                        let response = {
+                            message: "Success"
+                        };
+                        res.json(response);
+                    };
+                });
             };
         });
     }
