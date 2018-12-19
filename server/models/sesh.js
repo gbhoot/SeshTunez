@@ -3,6 +3,7 @@ var mongoose = require('../config/mongoose.js'),
     QueueItemSchema = require('./queueItem.js').schema;
 
 var SeshSchema = new mongoose.Schema({
+    name: {type: String, required: true},
     organizer: {type: UserSchema, required: true},
     attendees: [UserSchema],
     nowPlaying: {

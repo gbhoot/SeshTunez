@@ -30,6 +30,7 @@ export class HttpService {
   };
 
   addAttendeeToSesh(id: string, attendee: any) {
-    
-  }
+    return this._http.post('/db/v1/seshes/'+ id +'/addAttendee',
+      attendee);
+  };
 }
