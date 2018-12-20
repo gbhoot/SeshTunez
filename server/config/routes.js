@@ -3,6 +3,22 @@ var path = require('path'),
     spots = require('../controllers/spots.js');
 
 module.exports = function(app) {
+
+    /* FRONT-END */
+    app.get('/', function(req, res) {
+        res.render('index');
+    });
+
+    app.get('/sesh/:id', function(req, res) {
+        seshes.renderOne(req, res);
+        // res.render('seshRoom');
+    });
+
+
+
+
+    /* SERVER BACK-END */
+
     // Get all seshes
     app.get('/db/v1/seshes', function(req, res) {
         seshes.getAll(req, res);        
@@ -45,6 +61,6 @@ module.exports = function(app) {
 
     // Remaining routes direct to Angular app
     app.all("*", function(req, res) {
-        res.sendFile(path.resolve(__dirname, '../../public/dist/public/index.html'));
+        res.redirect('/');
     });
 }

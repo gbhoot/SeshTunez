@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Sesh Room</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" 
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
+        crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script>
+        $(document).ready(function() {
+            var sesh = <%-JSON.stringify(sesh)%>;
+            console.log(sesh);
+
+            $("#searchBtn").on('click', function(event) {
+                event.preventDefault();
+                console.log("COming in here");
+            });
+
+            window.onSpotifyWebPlaybackSDKReady = () => {
+                const token = 'BQB-bOW4dBF9dQhrFSIfT0v7RL79lfVZ4whTJJV1F-Pux_kk7lzmPlsr9XMyubZhCENuMsPgkk9dmoNdw5CCgWe1ReGvZZhCBy3jSBVyJcWlN_AGctYeMDR9JXqhPMMXhRD8ZXYuNDCQH-gX8mZqxT14kz2nKY7lCpYFa3sRk-jBY8MF7INuxDtz';
+                const player = new Spotify.Player({
+                    name: 'Web Playback SDK Quick Start Player',
+                    getOAuthToken: cb => { cb(token); }
+                });
+
+                // Error handling
+                player.addListener('initialization_error', ({ message }) => { console.error(message); });
+                player.addListener('authentication_error', ({ message }) => { console.error(message); });
+                player.addListener('account_error', ({ message }) => { console.error(message); });
+                player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+                // Playback status updates
+                player.addListener('player_state_changed', state => { console.log(state); });
+
+                // Ready
+                player.addListener('ready', ({ device_id }) => {
+                    console.log('Ready with Device ID', device_id);
+                });
+
+                // Not Ready
+                player.addListener('not_ready', ({ device_id }) => {
+                    console.log('Device ID has gone offline', device_id);
+                });
+
+                // Connect to the player!
+                player.connect();
+            };
+        });
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar bg-dark text-light py-3">
+            <div class="col-md-3"></div>
+            <div class="col text-center">
+                <h2><%= sesh.name %></h2>
+            </div>
+            <div class="col-md-3"></div>
+        </nav>
+    </header>
+
+    <main class="pt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center">
+                    <button class="btn btn-warning"
+                    id="searchBtn"
+                    >Search for Song</button>
+                </div>
+            </div>
+            
+            <div class="row">
+            </div>
+
+            <div class="row">
+            </div>
+        </div>
+    </main>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
+        crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" 
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" 
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" 
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" 
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -32,6 +32,23 @@ module.exports = {
             };
         });
     },
+
+    renderOne: function(req, res) {
+        let sid = req.params.id;
+        Sesh.find({_id: sid}, function(error, sesh) {
+            if (error) {
+                console.log("There was an issue: ", error);
+                res.render('seshRoom', error);
+            } else {
+                console.log(sesh);
+                let response = {
+                    message: "Success",
+                    sesh: sesh[0]
+                };
+                res.render('seshRoom', response);
+            };
+        });
+    },
     
     create: function(req, res) {
         let inc_user = req.body['user']
