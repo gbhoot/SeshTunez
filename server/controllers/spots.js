@@ -1,5 +1,5 @@
-var client_id = "1e530d7e14fc4d2986e6d3554dd3bb83",
-    client_secret = "3c673f6446cd418f894b78e9d0d77a8c",
+var client_id = "88dff42612e443f8a8aa5b293bd401d2",
+    client_secret = "f44600e7fa5c418d97e73d15362e78a0",
     spotifyWebAPI = require('spotify-web-api-node'),
     Sesh = require('../models/sesh.js');
 

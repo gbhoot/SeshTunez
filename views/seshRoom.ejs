@@ -19,17 +19,73 @@
             var sesh = <%-JSON.stringify(sesh)%>;
             console.log(sesh);
 
-            $("#searchBtn").on('click', function(event) {
-                event.preventDefault();
-                console.log("COming in here");
-            });
+            var socket = io();
 
+            const player_token = 'BQCusKdwsxIQMhHSC2arFQ5AEVgN2ZQHL1G7Uf1hL6KgHysjOku0uSa4lgIKBVDL3-JJ0l77K0n9uteDRF5T4h2xvW1FWBPsupCecfp7z0vT48SgtVl0x8DfW8cfqzAWPBu58IpYGxy_HkWlxqTpOxs_R6qzFYM8u43gYMJpAFl2lZd5w1Fh3hVWUmCJ';
+            const other_token = 'BQBB_yDsyDN14iteJ1XSr4ySQi5mZpoGHnD8F37SvdSTPZFMNALOZZB50RijvY5CXK6jGwdsY3u6LSkK2pxv_YsvQzNUJCo9Xj3dqJaHsr2Y6nG4VLSyd-1V6l4B6FN8FRA19si7MMrVlze4bQ2suQOMIttlc_pRSGcxoDolLqdiMIIsoO1JXu4EKZ59gcOod3JQRvEBaJfxHrHsa1uzFXVI7FQ-dG_7Wc396bW961cRAx4ueILAYFZSoitvult7GCRobG_4i8ya-jh69mUXkKLkkgczP_6S2ShSDh0';
+            const device_id = '57ea062da0bf9dfa4c92adf32cc108d3923822b4';
+
+            
             window.onSpotifyWebPlaybackSDKReady = () => {
-                const token = 'BQB-bOW4dBF9dQhrFSIfT0v7RL79lfVZ4whTJJV1F-Pux_kk7lzmPlsr9XMyubZhCENuMsPgkk9dmoNdw5CCgWe1ReGvZZhCBy3jSBVyJcWlN_AGctYeMDR9JXqhPMMXhRD8ZXYuNDCQH-gX8mZqxT14kz2nKY7lCpYFa3sRk-jBY8MF7INuxDtz';
                 const player = new Spotify.Player({
-                    name: 'Web Playback SDK Quick Start Player',
-                    getOAuthToken: cb => { cb(token); }
+                    name: sesh.name,
+                    getOAuthToken: cb => { cb(player_token); }
                 });
+
+                $("#search-form").on('submit', function(event) {
+                    event.preventDefault();
+                    let data = $(this).serializeArray();
+                    let query = data[0]['value'];
+                    if (query != "") {
+                        document.getElementById("collapsed-search").classList = "row my-4 collapse";
+                        $.ajax({
+                            type: 'POST',
+                            url: '/db/v1/seshes/'+ sesh._id +'/searchSong',
+                            data: {
+                                query: query
+                            },
+                            success: function(data) {
+                                document.getElementById("collapsed-result").classList = "row my-4 collapse show";
+                                console.log(data['song']);
+                                let uri = data['song']['uri'];
+                                document.getElementById("song-result").innerHTML = data['song'];                                
+                                fetchings(device_id, other_token, uri);
+                            }
+                        });
+                    }
+                });
+                
+                function fetchings(device_id, token, uri) {
+                    var url = "https://api.spotify.com/v1/me/player/play?device_id="+ device_id;
+                    console.log(url);
+                    fetch(url, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            'context_uri': uri
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer '+ token
+                        }
+                    });
+                };
+
+
+                function getPlayerStatus(token) {
+                    var url = "https://api.spotify/v1/me/player";
+                    fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer '+ token
+                        }
+                    }).then(function(data) {
+                        console.log(data);
+                    }).catch(function(message) {
+                        console.log(message)
+                    });
+                }
 
                 // Error handling
                 player.addListener('initialization_error', ({ message }) => { console.error(message); });
@@ -43,6 +99,8 @@
                 // Ready
                 player.addListener('ready', ({ device_id }) => {
                     console.log('Ready with Device ID', device_id);
+                    fetchings(device_id, other_token, 'spotify:album:5ht7ItJgpBH7W6vJ5BqpPr');
+                    // getPlayerStatus(other_token);
                 });
 
                 // Not Ready
@@ -73,15 +131,30 @@
             <div class="row">
                 <div class="col text-center">
                     <button class="btn btn-warning"
-                    id="searchBtn"
+                    id="searchBtn" data-toggle="collapse"
+                    data-target="#collapsed-search"
                     >Search for Song</button>
                 </div>
             </div>
             
-            <div class="row">
+            <div class="row collapse my-4" id="collapsed-search">
+                <div class="col"></div>
+                <div class="col-3 text-center form-group">
+                    <form action="" id="search-form">
+                        <input type="text" name="query" class="form-control my-2"
+                        placeholder="Enter artist name or track title">
+                        <button class="btn btn-success">Search</button>
+                    </form>
+                </div>
+                <div class="col"></div>
             </div>
 
-            <div class="row">
+            <div class="row collapse my-4" id="collapsed-result">
+                <div class="col"></div>
+                <div class="col-3 text-center form-group">
+                    <section id="song-result"></section>
+                </div>
+                <div class="col"></div>
             </div>
         </div>
     </main>

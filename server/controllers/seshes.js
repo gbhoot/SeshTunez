@@ -40,7 +40,6 @@ module.exports = {
                 console.log("There was an issue: ", error);
                 res.render('seshRoom', error);
             } else {
-                console.log(sesh);
                 let response = {
                     message: "Success",
                     sesh: sesh[0]
