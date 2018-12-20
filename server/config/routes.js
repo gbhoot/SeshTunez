@@ -1,5 +1,6 @@
 var path = require('path'),
-    seshes = require('../controllers/seshes.js');
+    seshes = require('../controllers/seshes.js'),
+    spots = require('../controllers/spots.js');
 
 module.exports = function(app) {
     // Get all seshes
@@ -35,6 +36,11 @@ module.exports = function(app) {
     // Add attendee to sesh by ID
     app.post('/db/v1/seshes/:id/addAttendee', function(req, res) {
         seshes.addAttendee(req, res);
+    });
+
+    // Search for a song
+    app.post('/db/v1/seshes/:id/searchSong', function(req, res) {
+        spots.songSearch(req, res);
     });
 
     // Remaining routes direct to Angular app
