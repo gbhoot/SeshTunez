@@ -6,7 +6,7 @@ module.exports = function(app) {
 
     /* FRONT-END */
     app.get('/', function(req, res) {
-        res.render('index');
+        res.render('home');
     });
 
     app.get('/sesh/:id', function(req, res) {
