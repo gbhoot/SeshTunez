@@ -4,8 +4,14 @@ var mongoose = require('../config/mongoose.js'),
 
 var SeshSchema = new mongoose.Schema({
     name: {type: String, required: true},
-    organizer: {type: UserSchema, required: true},
-    attendees: [UserSchema],
+    // Sesh has 1 organizer, user has many seshes
+    organizer: {type: String, required: true},
+    // Sesh has many invitees (users who have been invited, but not accepted invitation)
+    invitees: [String],
+    // Sesh has many attendees (users who have been invited and accepted)
+    attendees: [String],
+    // Sesh has many crashers (users who are currently in the sesh room, whether invited, accepted or not)
+    crashers: [String],
     nowPlaying: {
         itemID: String,
         status: String,

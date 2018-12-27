@@ -19,7 +19,7 @@ module.exports = {
 
     getOne: function(req, res) {
         let sid = req.params.id;
-        Sesh.find({_id: sid}, function(error, sesh) {
+        Sesh.findOne({_id: sid}, function(error, sesh) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
@@ -35,14 +35,14 @@ module.exports = {
 
     renderOne: function(req, res) {
         let sid = req.params.id;
-        Sesh.find({_id: sid}, function(error, sesh) {
+        Sesh.findOne({_id: sid}, function(error, sesh) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.render('seshRoom', error);
             } else {
                 let response = {
                     message: "Success",
-                    sesh: sesh[0]
+                    sesh: sesh
                 };
                 res.render('seshRoom', response);
             };
@@ -50,38 +50,34 @@ module.exports = {
     },
     
     create: function(req, res) {
-        let inc_user = req.body['user']
+        let uid = req.session.uid;
         let inc_sesh = req.body['sesh'];
-        let user = new User(inc_user);
-        user.save(function(error) {
+        inc_sesh.organizer = user._id;
+        let sesh = new Sesh(inc_sesh);
+        sesh.save(function(error) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
-                inc_sesh.organizer = user;
-                let sesh = new Sesh(inc_sesh);
-                sesh.save(function(error) {
-                    if (error) {
-                        console.log("There was an issue: ", error);
-                        res.json(error);
-                    } else {
-                        let response = {
-                            message: "Success",
-                            sesh: sesh
-                        };
-                        res.json(response);
-                    };
-                });
-            }
+                let response = {
+                    message: "Success",
+                    sesh: sesh
+                };
+                res.json(response);
+            };
         });
     },
 
     destroyAll: function(req, res) {
-        Sesh.deleteMany({}, function(error) {
+        Sesh.find({}, function(error, seshes) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
+                for (let sesh of seshes) {
+                    req.params.id = sesh._id;
+                    this.destroyOne(req, res);
+                };
                 let response = {
                     message: "Success"
                 };
@@ -92,15 +88,67 @@ module.exports = {
 
     destroyOne: function(req, res) {
         let sid = req.params.id;
-        Sesh.deleteOne({_id: sid}, function(error) {
+        Sesh.find({_id: sid}, function(error, sesh) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
-                let response = {
-                    message: "Success"
+                if (sesh == null || sesh.length == 0) {
+                    console.log("Sesh not found");
+                    let response = {
+                        message: "Failure",
+                        content: "Sesh not found"
+                    };
+                    res.json(response);
+                } else {
+                    // Sesh - organizer == User - seshes
+                    let oid = sesh.organizer._id;
+                    User.update({_id: oid}, {$pull: {seshes: sesh._id}}, function(error) {
+                        if (error) {
+                            console.log("There was an issue: ", error);
+                            res.json(error);
+                        } else {
+                            // Sesh - invitees == User - invitations
+                            let inviteeList = sesh.invitees;
+                            User.updateMany({_id: {$in: inviteeList}}, {$pull: {invitations: sesh._id}}, function(error) {
+                                if (error) {
+                                    console.log("There was an issue: ", error);
+                                    res.json(error);
+                                } else {
+                                    // Sesh - attendees == User - events
+                                    let attendeeList = sesh.attendees;
+                                    User.updateMany({_id: {$in: attendeeList}}, {$pull: {events: sesh._id}}, function(error) {
+                                        if (error) {
+                                            console.log("There was an issue: ", error);
+                                            res.json(error);
+                                        } else {
+                                            // Sesh - crashers == User - parties
+                                            let crasherList = sesh.crashers;
+                                            User.updateMany({_id: {$in: crasherList}}, {$pull: {parties: sesh._id}}, function(error) {
+                                                if (error) {
+                                                    console.log("There was an issue: ", error);
+                                                    res.json(error);
+                                                } else {
+                                                    Sesh.deleteOne({_id: sid}, function(error) {
+                                                        if (error) {
+                                                            console.log("There was an issue: ", error);
+                                                            res.json(error);
+                                                        } else {
+                                                            let response = {
+                                                                message: "Success"
+                                                            };
+                                                            res.json(response);
+                                                        };
+                                                    });
+                                                };
+                                            });
+                                        };
+                                    });
+                                };
+                            });
+                        };
+                    });
                 };
-                res.json(response);
             };
         });
     },
@@ -118,30 +166,6 @@ module.exports = {
                     message: "Success"
                 };
                 res.json(response);
-            };
-        });
-    },
-
-    addAttendee: function(req, res) {
-        let sid = req.params.id;
-        let inc_user = req.body;
-        let user = new User(inc_user);
-        user.save(function(error) {
-            if (error) {
-                console.log("There was an issue: ", error);
-                res.json(error);
-            } else {
-                Sesh.update({_id: sid}, {$push: {attendees: user}}, function(error) {
-                    if (error) {
-                        console.log("There was an issue: ", error);
-                        res.json(error);
-                    } else {
-                        let response = {
-                            message: "Success"
-                        };
-                        res.json(response);
-                    };
-                });
             };
         });
     }
