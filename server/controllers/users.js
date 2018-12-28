@@ -126,8 +126,8 @@ module.exports = {
                     message: "Success",
                 };    
                 res.json(response);
-            };    
-        })    
+            };
+        });
     },
 
     inviteAccepted: function(req, res) {
@@ -152,4 +152,13 @@ module.exports = {
             };
         });
     },
+
+    sendInvitations: function(req, res) {
+        let sid = req.params.id;
+    },
+
+    partyCrasher: function(req, res) {
+        let sid = req.params.id;
+        let uid = req.session.uid;
+    }
 }
