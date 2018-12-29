@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Sesh Tunez | Login</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" 
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="./style/login.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./scripts/login.js"></script>
+</head>
+
+<body class="bg-light">
+    <header>
+        <div class="jumbotron text-center">
+            <h2 class="display-4">Sesh Tunez</h2>
+            <!-- <div class="row">
+                <img class="mx-auto" src="./images/sesh-tunez.png" alt="logo" id="logo">
+            </div> -->
+            <hr class="my-2">
+            <h6>Registration</h6>
+        </div>
+    </header>
+
+    <main>
+        <form method="POST" class="form-signin" id="form-register"></form>
+        <form method="POST" class="form-signin" id="form-login"></form>
+
+
+        <div class="row form-label-group my-4">
+            <div class="col-md-3"></div>
+            <div class="col">
+                <input type="text" id="username" required name="username"
+                class="form-control" form="form-register">
+                <label class="form-control-placeholder" for="username">Username</label>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+
+        <div class="row form-label-group my-4">
+            <div class="col-md-3"></div>
+            <div class="col">
+                <input type="email" id="email" required name="email"
+                class="form-control" form="form-register">
+                <label class="form-control-placeholder" for="email">Email address</label>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+
+        <div class="row form-label-group my-4">
+            <div class="col-md-3"></div>
+            <div class="col">
+                <input type="password" id="password" required name="password"
+                class="form-control" form="form-register">
+                <label class="form-control-placeholder" for="password">Password</label>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+
+        <div class="row form-label-group my-4">
+            <div class="col-md-3"></div>
+            <div class="col">
+                <input type="password" id="pw_confirm" required name="pw_confirm"
+                class="form-control" form="form-register">
+                <label class="form-control-placeholder" for="pw_confirn">Password confirmation</label>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+
+        <div class="row form-label-group my-4">
+            <div class="col-md-3"></div>
+            <div class="col text-right">
+                <button class="btn btn-success" type="submit" form="form-register"
+                >Register</button>
+                <button type="button" class="btn btn-primary" data-toggle="collapse"
+                data-target=".login-fields">Have an account?</button>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+
+        <div class="row form-label-group my-4 collapse login-fields">
+            <div class="col"></div>
+            <div class="col">
+                <input type="email" id="email" required name="email"
+                class="form-control" form="form-login">
+                <label class="form-control-placeholder" for="email">Email address</label>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+
+        <div class="row form-label-group my-4 collapse login-fields">
+            <div class="col"></div>
+            <div class="col">
+                <input type="password" id="password" required name="password"
+                class="form-control" form="form-login">
+                <label class="form-control-placeholder" for="password">Password</label>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+            
+        <div class="row form-label-group my-4 collapse login-fields">
+            <div class="col"></div>
+            <div class="col text-right">
+                <button type="submit" class="btn btn-primary" form="form-login">Login</button>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+    </main>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
+        crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" 
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" 
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" 
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" 
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

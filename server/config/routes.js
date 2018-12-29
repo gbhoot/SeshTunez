@@ -1,12 +1,17 @@
 var path = require('path'),
     seshes = require('../controllers/seshes.js'),
-    spots = require('../controllers/spots.js');
+    spots = require('../controllers/spots.js'),
+    users = require('../controllers/users.js');
 
 module.exports = function(app) {
 
     /* FRONT-END */
     app.get('/', function(req, res) {
         res.render('home');
+    });
+
+    app.get('/signup', function(req, res) {
+        res.render('login');
     });
 
     app.get('/sesh/:id', function(req, res) {
@@ -57,6 +62,26 @@ module.exports = function(app) {
     // Search for a song
     app.post('/db/v1/seshes/:id/searchSong', function(req, res) {
         spots.songSearch(req, res);
+    });
+    
+    // Get all users
+    app.get('/db/v1/users', function(req, res) {
+        users.getAll(req, res);
+    });
+    
+    // Get one user
+    app.get('db/v1/users/:id', function(req, res) {
+        users.getOne(req, res);
+    });
+    
+    // Register (create a user)
+    app.post('/db/v1/users/register', function(req, res) {
+        users.register(req, res);
+    });
+
+    // Login user
+    app.post('/db/v1/users/login', function(req, res) {
+        users.login(req, res);
     });
 
     // Remaining routes direct to Angular app

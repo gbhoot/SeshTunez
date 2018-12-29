@@ -71,26 +71,35 @@ module.exports = {
 
     login: function(req, res) {
         let inc_user = req.body;
-        User.find({email: inc_user.email}, function(error, user) {
+        User.find({email: inc_user.email}, function(error, users) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
-            } else if (user.length == 0 || user == null) {
+            } else if (users.length == 0 || users == null) {
                 console.log("User email not found");
                 let response = {
                     message: "Failure",
                     content: "User email address not found"
                 };
                 res.json(response);
-            } else if (user.length == 1) {
-                console.log("Single user found");
+            } else if (users.length == 1) {
+                let user = users[0];
+                console.log("Single user found", user, inc_user);
                 bcrypt.compare(inc_user.password, user.password)
                 .then(result => {
                     console.log(result);
-                    req.session.uid = user._id;
-                    let response = {
-                        message: "Success",
-                        user: user
+                    let response = {};
+                    if (result) {
+                        req.session.uid = user._id;
+                        response = {
+                            message: "Success",
+                            user: user
+                        };
+                    } else {
+                        response = {
+                            message: "Failure",
+                            content: "Password is incorrect"
+                        };
                     };
                     res.json(response);
                 }).catch(error => {
