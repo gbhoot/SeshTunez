@@ -21,11 +21,12 @@ module.exports = {
 
     getOne: function(req, res) {
         let uid = req.params.id;
-        User.find({_id: uid}, function(error, user) {
+        User.find({_id: uid}, function(error, users) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
+                let user = users[0];
                 let response = {
                     message: "Success",
                     user: user
@@ -110,6 +111,15 @@ module.exports = {
         });
     },
 
+    logout: function(req, res) {
+        if (!req.session.uid) {
+            res.redirect('/');
+        } else {
+            delete req.session.uid;
+            res.redirect('/');
+        };
+    },
+
     destroyAll: function(req, res) {
         User.deleteMany({}, function(error) {
             if (error) {
@@ -133,10 +143,57 @@ module.exports = {
             } else {
                 let response = {
                     message: "Success",
-                };    
+                };
                 res.json(response);
             };
         });
+    },
+
+    renderHome: function(req, res) {
+        console.log(req.session);
+        if (req.session.uid) {
+            res.redirect('/dashboard');
+        } else {
+            res.render('home');
+        };
+    },
+
+    renderSignUp: function(req, res) {
+        console.log(req.session);
+        if (req.session.uid) {
+            res.redirect('/dashboard');
+        } else {
+            res.render('login');
+        };
+    },
+
+    renderDash: function(req, res) {
+        if (!req.session.uid) {
+            res.redirect('/');
+        } else {
+            let uid = req.session.uid;
+            User.find({_id: uid}, function(error, users) {
+                if (error) {
+                    console.log("There was an issue: ", error);
+                    res.render('dashboard', error);
+                } else {
+                    let response = {};
+                    if (users.length == 0 || users == null) {
+                        response = {
+                            message: "Failure",
+                            content: "Logged in user not found in database"
+                        };
+                    } else {
+                        let user = users[0];
+                        response = {
+                            message: "Success",
+                            user: user
+                        };
+                    };
+                    res.render('dashboard', response);
+                };
+            });
+        };
     },
 
     inviteAccepted: function(req, res) {
@@ -169,5 +226,5 @@ module.exports = {
     partyCrasher: function(req, res) {
         let sid = req.params.id;
         let uid = req.session.uid;
-    }
+    },
 }

@@ -19,11 +19,12 @@ module.exports = {
 
     getOne: function(req, res) {
         let sid = req.params.id;
-        Sesh.findOne({_id: sid}, function(error, sesh) {
+        Sesh.findOne({_id: sid}, function(error, seshes) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
+                let sesh = seshes[0];
                 let response = {
                     message: "Success",
                     sesh: sesh
@@ -33,26 +34,10 @@ module.exports = {
         });
     },
 
-    renderOne: function(req, res) {
-        let sid = req.params.id;
-        Sesh.findOne({_id: sid}, function(error, sesh) {
-            if (error) {
-                console.log("There was an issue: ", error);
-                res.render('seshRoom', error);
-            } else {
-                let response = {
-                    message: "Success",
-                    sesh: sesh
-                };
-                res.render('seshRoom', response);
-            };
-        });
-    },
-    
     create: function(req, res) {
         let uid = req.session.uid;
         let inc_sesh = req.body['sesh'];
-        inc_sesh.organizer = user._id;
+        inc_sesh.organizer = uid;
         let sesh = new Sesh(inc_sesh);
         sesh.save(function(error) {
             if (error) {
@@ -88,12 +73,12 @@ module.exports = {
 
     destroyOne: function(req, res) {
         let sid = req.params.id;
-        Sesh.find({_id: sid}, function(error, sesh) {
+        Sesh.find({_id: sid}, function(error, seshes) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
-                if (sesh == null || sesh.length == 0) {
+                if (seshes == null || seshes.length == 0) {
                     console.log("Sesh not found");
                     let response = {
                         message: "Failure",
@@ -102,6 +87,7 @@ module.exports = {
                     res.json(response);
                 } else {
                     // Sesh - organizer == User - seshes
+                    let sesh = seshes[0];
                     let oid = sesh.organizer._id;
                     User.update({_id: oid}, {$pull: {seshes: sesh._id}}, function(error) {
                         if (error) {
@@ -168,5 +154,30 @@ module.exports = {
                 res.json(response);
             };
         });
-    }
+    },
+
+    renderSesh: function(req, res) {
+        let sid = req.params.id;
+        Sesh.find({_id: sid}, function(error, seshes) {
+            if (error) {
+                console.log("There was an issue: ", error);
+                res.render('seshRoom', error);
+            } else {
+                let response = {};
+                if (seshes.length == 0 || seshes == null) {
+                    response = {
+                        message: "Failure",
+                        content: "No user found" 
+                    };
+                } else {
+                    let sesh = seshes[0];
+                    response = {
+                        message: "Success",
+                        sesh: sesh
+                    };
+                };
+                res.render('seshRoom', response);
+            };
+        });
+    },
 }

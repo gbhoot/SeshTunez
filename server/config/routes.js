@@ -6,16 +6,28 @@ var path = require('path'),
 module.exports = function(app) {
 
     /* FRONT-END */
+    // Home page render
     app.get('/', function(req, res) {
-        res.render('home');
+        users.renderHome(req, res);
     });
 
+    // Signup/Signin page render
     app.get('/signup', function(req, res) {
-        res.render('login');
+        users.renderSignUp(req, res);
+    });
+
+    // Route to handle user logout
+    app.get('/logout', function(req, res) {
+        users.logout(req, res);
+    });
+
+    // User dashboard page render (must be logged in)
+    app.get('/dashboard', function(req, res) {
+        users.renderDash(req, res);
     });
 
     app.get('/sesh/:id', function(req, res) {
-        seshes.renderOne(req, res);
+        seshes.renderSesh(req, res);
         // res.render('seshRoom');
     });
 

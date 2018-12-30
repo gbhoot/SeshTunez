@@ -13,7 +13,11 @@ $(document).ready(function() {
             url: '/db/v1/users/register',
             data: userD,
             success: function(data) {
-                console.log(data);
+                if (data['message'] == "Success") {
+
+                } else {
+                    console.log(data['message']);
+                };
             }
         });
     });
@@ -21,7 +25,6 @@ $(document).ready(function() {
     $("#form-login").on('submit', function(event) {
         event.preventDefault();
         let data = $(this).serializeArray();
-        console.log(data);
         let userD = {
             email: data[0]['value'],
             password: data[1]['value']
@@ -31,7 +34,11 @@ $(document).ready(function() {
             url: '/db/v1/users/login',
             data: userD,
             success: function(data) {
-                console.log(data);
+                if (data['message'] == "Success") {
+                    window.location.href = "/dashboard";
+                } else {
+                    console.log(data['message']);
+                };
             }
         });
     });
