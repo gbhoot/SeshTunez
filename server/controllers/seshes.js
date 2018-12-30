@@ -19,15 +19,23 @@ module.exports = {
 
     getOne: function(req, res) {
         let sid = req.params.id;
-        Sesh.findOne({_id: sid}, function(error, seshes) {
+        Sesh.find({_id: sid}, function(error, seshes) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
-                let sesh = seshes[0];
-                let response = {
-                    message: "Success",
-                    sesh: sesh
+                let response = {};
+                if (seshes.length == 0 || seshes == null) {
+                    response = {
+                        message: "Failure",
+                        content: "Sesh not found"
+                    };
+                } else {
+                    let sesh = seshes[0];
+                    let response = {
+                        message: "Success",
+                        sesh: sesh
+                    };
                 };
                 res.json(response);
             };
@@ -37,18 +45,33 @@ module.exports = {
     create: function(req, res) {
         let uid = req.session.uid;
         let inc_sesh = req.body['sesh'];
-        inc_sesh.organizer = uid;
-        let sesh = new Sesh(inc_sesh);
-        sesh.save(function(error) {
+        User.find({_id: uid}, function(error, users) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
-                let response = {
-                    message: "Success",
-                    sesh: sesh
+                let response = {};
+                if (users.length == 0 || users == null) {
+                    response = {
+                        message: "Failure",
+                        content: "Logged in user not found"
+                    };
+                } else {
+                    inc_sesh.organizer = users[0];
+                    let sesh = new Sesh(inc_sesh);
+                    sesh.save(function(error) {
+                        if (error) {
+                            console.log("There was an issue: ", error);
+                            res.json(error);
+                        } else {
+                            let response = {
+                                message: "Success",
+                                sesh: sesh
+                            };
+                            res.json(response);
+                        };
+                    });
                 };
-                res.json(response);
             };
         });
     },

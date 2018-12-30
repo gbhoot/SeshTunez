@@ -1,4 +1,6 @@
 var User = require('../models/user.js'),
+    Sesh = require('../models/sesh.js'),
+    seshes = require('./seshes.js'),
     bcrypt = require('bcrypt');
 
 const saltRounds = 10;
@@ -27,6 +29,8 @@ module.exports = {
                 res.json(error);
             } else {
                 let user = users[0];
+                let invites = user['invitations'];
+
                 let response = {
                     message: "Success",
                     user: user
@@ -121,30 +125,73 @@ module.exports = {
     },
 
     destroyAll: function(req, res) {
-        User.deleteMany({}, function(error) {
+        User.find({}, function(error, users) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
+                for (let user of users) {
+                    req.params.id = user._id;
+                    this.destroyOne(req, res);
+                };
                 let response = {
-                    message: "Success",
-                };    
+                    message: "Success"
+                };
                 res.json(response);
-            };    
-        });    
-    },    
+            };
+        });
+    },
 
     destroyOne: function(req, res) {
         let uid = req.params.id;
-        User.deleteOne({_id: uid}, function(error) {
+        User.find({_id: uid}, function(error, users) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
             } else {
-                let response = {
-                    message: "Success",
+                let response = {};
+                if (users.length == 0 || users == null) {
+                    response = {
+                        message: "Failure",
+                        content: "User not found"
+                    };
+                    res.json(response);
+                } else {
+                    let user = users[0];
+                    let organized = user['seshes'];
+                    for (let sesh of organized) {
+                        req.params.id = sesh._id;
+                        seshes.destroyOne(req, res);
+                    }
+                    let invites = user['invitations'];
+                    Sesh.updateMany({_id: {$in: invites}}, {$pull: {invitees: uid}}, function(error) {
+                        if (error) {
+                            console.log("There was an issue: ", error);
+                            res.json(error);
+                        } else {
+                            let attending = user['events'];
+                            Sesh.updateMany({_id: {$in: attending}}, {$pull: {attendees: uid}}, function(error) {
+                                if (error) {
+                                    console.log("There was an issue: ", error);
+                                    res.json(error);
+                                } else {
+                                    let parties = user['parties'];
+                                    Sesh.updateMany({_id: {$in: parties}}, {$pull: {crashers: uid}}, function(error) {
+                                        if (error) {
+                                            console.log("There was an issue: ", error);
+                                            res.json(error);
+                                        } else {
+                                            response = {
+                                                message: "Success",
+                                            };
+                                            res.json(response);
+                                        };
+                                    });
+                                };
+                            });
+                        };
+                    });
                 };
-                res.json(response);
             };
         });
     },
