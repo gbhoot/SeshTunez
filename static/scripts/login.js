@@ -14,7 +14,7 @@ $(document).ready(function() {
             data: userD,
             success: function(data) {
                 if (data['message'] == "Success") {
-
+                    window.location.href = "/dashboard";
                 } else {
                     console.log(data['message']);
                 };

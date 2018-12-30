@@ -17,12 +17,12 @@
 
 <body>
     <header>
-        <nav class="navbar bg-dark text-light py-3">
+        <nav class="navbar bg-dark text-light py-3 mb-5">
             <div class="col">
                 <a href="/" style="text-decoration:none" class="text-light"
                 ><h3>Sesh Tunez</h3></a>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 text-right">
                 <a href="/logout"
                 class="btn btn-outline-danger">Logout</a>
             </div>
@@ -30,10 +30,62 @@
     </header>
 
     <main>
-        <section>
-            <div></div>
-        </section>
+        <div class="row mx-3 px-3">
+            <div class="col text-center">
+                <h4>Seshes Attending</h4>
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col">Sesh Name</th>
+                            <th scope="col">Organizer</th>
+                            <th scope="col">Leave</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (var i of user.inviteList) { %>
+                            <tr>
+                                <th scope="row"><% i+1 %></th>
+                                <td><%= user.inviteList[i].name %></td>
+                                <td><%= user.inviteList[i].organizer.username %></td>
+                                <td><a href="/db/v1/seshes/<%= user.inviteList[i]._id %>/removeAttendee"
+                                    class="btn btn-danger">Leave Sesh</a></td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col text-center py-5">
+                <a href="/createSesh" class="btn btn-lg btn-primary"
+                >Create a Sesh</a>
+            </div>
+            <div class="col text-center">
+                <h4>Sesh Invitations</h4>
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col">Sesh Name</th>
+                            <th scope="col">Invited By</th>
+                            <th scope="col">Accept</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (var i of user.eventList) { %>
+                            <tr>
+                                <th scope="row"><% i+1 %></th>
+                                <td><%= user.eventList[i].name %></td>
+                                <td><%= user.eventList[i].organizer.username %></td>
+                                <td><a href="/db/v1/seshes/<%= user.eventList[i]._id %>/acceptInvitation"
+                                    class="btn btn-success">Attend</a></td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </main>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 

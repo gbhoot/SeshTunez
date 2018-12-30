@@ -66,9 +66,14 @@ module.exports = function(app) {
         seshes.update(req, res);
     });
 
-    // Add attendee to sesh by ID
-    app.post('/db/v1/seshes/:id/addAttendee', function(req, res) {
-        seshes.addAttendee(req, res);
+    // Accept invitation to sesh by ID
+    app.get('/db/v1/seshes/:id/acceptInvitation', function(req, res) {
+        users.inviteAccepted(req, res);
+    });
+
+    // Remove sesh from attending list by ID
+    app.get('/db/v1/seshes/:id/removeAttendee', function(req, res) {
+        users.removeAttendance(req, res);
     });
 
     // Search for a song
@@ -94,6 +99,11 @@ module.exports = function(app) {
     // Login user
     app.post('/db/v1/users/login', function(req, res) {
         users.login(req, res);
+    });
+
+    // Remove single user
+    app.delete('/db/v1/users/:id', function(req, res) {
+        users.destroyOne(req, res);
     });
 
     // Remaining routes direct to Angular app

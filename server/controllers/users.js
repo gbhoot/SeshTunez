@@ -29,8 +29,6 @@ module.exports = {
                 res.json(error);
             } else {
                 let user = users[0];
-                let invites = user['invitations'];
-
                 let response = {
                     message: "Success",
                     user: user
@@ -76,7 +74,7 @@ module.exports = {
 
     login: function(req, res) {
         let inc_user = req.body;
-        User.find({email: inc_user.email}, function(error, users) {
+        User.find({email: inc_user.emailL}, function(error, users) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
@@ -90,7 +88,7 @@ module.exports = {
             } else if (users.length == 1) {
                 let user = users[0];
                 console.log("Single user found", user, inc_user);
-                bcrypt.compare(inc_user.password, user.password)
+                bcrypt.compare(inc_user.passwordL, user.password)
                 .then(result => {
                     console.log(result);
                     let response = {};
@@ -111,6 +109,12 @@ module.exports = {
                     console.log("There was an issue: ", error);
                     res.json(error);
                 });
+            } else {
+                let response = {
+                    message: "Failure",
+                    content: "Multiple accounts found with email address"
+                };
+                res.json(response);
             };
         });
     },
@@ -181,10 +185,17 @@ module.exports = {
                                             console.log("There was an issue: ", error);
                                             res.json(error);
                                         } else {
-                                            response = {
-                                                message: "Success",
-                                            };
-                                            res.json(response);
+                                            User.deleteOne({_id: uid}, function(error) {
+                                                if (error) {
+                                                    console.log("There was an issue: ", error);
+                                                    res.json(error);
+                                                } else {
+                                                    response = {
+                                                        message: "Success",
+                                                    };
+                                                    res.json(response);
+                                                };
+                                            });
                                         };
                                     });
                                 };
@@ -230,14 +241,33 @@ module.exports = {
                             message: "Failure",
                             content: "Logged in user not found in database"
                         };
+                        res.render('dashboard', response);
                     } else {
                         let user = users[0];
-                        response = {
-                            message: "Success",
-                            user: user
-                        };
+                        let invitations = user['invitations'];
+                        Sesh.find({_id: {$in: invitations}}, function(error, seshes) {
+                            if (error) {
+                                console.log("There was an issue: ", error);
+                                res.render('dashboard', error);
+                            } else {
+                                user.inviteList = seshes;
+                                let events = user['events'];
+                                Sesh.find({_id: {$in: events}}, function(error, seshes) {
+                                    if (error) {
+                                        console.log("There was an issue: ", error);
+                                        res.render('dashboard', error);
+                                    } else {
+                                        user.eventList = seshes;
+                                        response = {
+                                            message: "Success",
+                                            user: user
+                                        };
+                                        res.render('dashboard', response);
+                                    };
+                                });
+                            };
+                        });
                     };
-                    res.render('dashboard', response);
                 };
             });
         };
@@ -256,6 +286,29 @@ module.exports = {
                         console.log("There was an issue: ", error);
                         res.json(error);
                      } else {
+                        let response = {
+                            message: "Success"
+                        };
+                        res.json(response);
+                    };
+                });
+            };
+        });
+    },
+
+    removeAttendance: function(req, res) {
+        let sid = req.params.id;
+        let uid = req.session.uid;
+        User.update({_id: uid}, {$pull: {events: sid}}, function(error) {
+            if (error) {
+                console.log("There was an issue: ", error);
+                res.json(error);
+            } else {
+                Sesh.update({_id: sid}, {$pull: {attendees: uid}}, function(error) {
+                    if (error) {
+                        console.log("There was an issue: ", error);
+                        res.json(error);
+                    } else {
                         let response = {
                             message: "Success"
                         };
