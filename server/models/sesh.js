@@ -7,14 +7,14 @@ var SeshSchema = new mongoose.Schema({
     // Sesh has 1 organizer, user has many seshes
     organizer: {type: UserSchema, required: true},
     // Sesh has many invitees (users who have been invited, but not accepted invitation), users = invitations
-    invitees: [String],
+    invitees: {type: [String], default: ['']},
     // Sesh has many attendees (users who have been invited and accepted), users = events
-    attendees: [String],
+    attendees: {type: [String], default: ['']},
     // Sesh has many crashers (users who are currently in the sesh room, whether invited, accepted or not), users = parties
-    crashers: [String],
+    crashers: {type: [String], default: ['']},
     nowPlaying: {
-        itemID: String,
-        status: String,
+        itemID: {type: String, default: ''},
+        status: {type: String, default: ''},
         progress: {type: Number, default: 0}
     },
     queue: {type: [QueueItemSchema]},

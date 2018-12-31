@@ -16,7 +16,7 @@ $(document).ready(function() {
                 if (data['message'] == "Success") {
                     window.location.href = "/dashboard";
                 } else {
-                    console.log(data['message']);
+                    console.log(data);
                 };
             }
         });
@@ -37,7 +37,7 @@ $(document).ready(function() {
                 if (data['message'] == "Success") {
                     window.location.href = "/dashboard";
                 } else {
-                    console.log(data['message']);
+                    console.log(data);
                 };
             }
         });

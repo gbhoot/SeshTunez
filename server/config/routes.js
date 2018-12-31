@@ -106,6 +106,10 @@ module.exports = function(app) {
         users.destroyOne(req, res);
     });
 
+    app.post('/db/v1/users/:id/editUser', function(req, res) {
+        users.deleteUserInfo(req, res);
+    });
+
     // Remaining routes direct to Angular app
     app.all("*", function(req, res) {
         res.redirect('/');

@@ -44,7 +44,7 @@ module.exports = {
 
     create: function(req, res) {
         let uid = req.session.uid;
-        let inc_sesh = req.body['sesh'];
+        let inc_sesh = req.body;
         User.find({_id: uid}, function(error, users) {
             if (error) {
                 console.log("There was an issue: ", error);
@@ -56,19 +56,28 @@ module.exports = {
                         message: "Failure",
                         content: "Logged in user not found"
                     };
+                    res.json(response);
                 } else {
                     inc_sesh.organizer = users[0];
+                    inc_sesh.attendees = [users[0]._id];
                     let sesh = new Sesh(inc_sesh);
                     sesh.save(function(error) {
                         if (error) {
                             console.log("There was an issue: ", error);
                             res.json(error);
                         } else {
-                            let response = {
-                                message: "Success",
-                                sesh: sesh
-                            };
-                            res.json(response);
+                            User.updateOne({_id: uid}, {$push: {events: sesh._id, seshes: sesh._id}}, function(error) {
+                                if (error) {
+                                    console.log("There was an issue: ", error);
+                                    res.json(error);
+                                } else {
+                                    response = {
+                                        message: "Success",
+                                        sesh: sesh
+                                    };
+                                    res.json(response);
+                                };
+                            });
                         };
                     });
                 };
@@ -112,28 +121,28 @@ module.exports = {
                     // Sesh - organizer == User - seshes
                     let sesh = seshes[0];
                     let oid = sesh.organizer._id;
-                    User.update({_id: oid}, {$pull: {seshes: sesh._id}}, function(error) {
+                    User.update({_id: oid}, {$pull: {seshes: sid}}, function(error) {
                         if (error) {
                             console.log("There was an issue: ", error);
                             res.json(error);
                         } else {
                             // Sesh - invitees == User - invitations
-                            let inviteeList = sesh.invitees;
-                            User.updateMany({_id: {$in: inviteeList}}, {$pull: {invitations: sesh._id}}, function(error) {
+                            let inviteeList = sesh['invitees'];
+                            User.updateMany({_id: {$in: inviteeList}}, {$pull: {invitations: sid}}, function(error) {
                                 if (error) {
                                     console.log("There was an issue: ", error);
                                     res.json(error);
                                 } else {
                                     // Sesh - attendees == User - events
-                                    let attendeeList = sesh.attendees;
-                                    User.updateMany({_id: {$in: attendeeList}}, {$pull: {events: sesh._id}}, function(error) {
+                                    let attendeeList = sesh['attendees'];
+                                    User.updateMany({_id: {$in: attendeeList}}, {$pull: {events: sid}}, function(error) {
                                         if (error) {
                                             console.log("There was an issue: ", error);
                                             res.json(error);
                                         } else {
                                             // Sesh - crashers == User - parties
-                                            let crasherList = sesh.crashers;
-                                            User.updateMany({_id: {$in: crasherList}}, {$pull: {parties: sesh._id}}, function(error) {
+                                            let crasherList = sesh['crashers'];
+                                            User.updateMany({_id: {$in: crasherList}}, {$pull: {parties: sid}}, function(error) {
                                                 if (error) {
                                                     console.log("There was an issue: ", error);
                                                     res.json(error);

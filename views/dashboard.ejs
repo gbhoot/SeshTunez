@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" 
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
         crossorigin="anonymous">
+    <link rel="stylesheet" href="./style/dashboard.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="./scripts/dashboard.js"></script>
 </head>
@@ -43,21 +44,38 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% for (var i of user.inviteList) { %>
+                        <% for (var i of user.eventList) { %>
                             <tr>
                                 <th scope="row"><% i+1 %></th>
-                                <td><%= user.inviteList[i].name %></td>
-                                <td><%= user.inviteList[i].organizer.username %></td>
-                                <td><a href="/db/v1/seshes/<%= user.inviteList[i]._id %>/removeAttendee"
-                                    class="btn btn-danger">Leave Sesh</a></td>
+                                <td><%= user.eventList[i].name %></td>
+                                <td><%= user.eventList[i].organizer.username %></td>
+                                <td><a href="/db/v1/seshes/<%= user.eventList[i]._id %>/removeAttendee"
+                                    class="btn btn-success">Attend</a></td>
                             </tr>
                         <% } %>
                     </tbody>
                 </table>
             </div>
-            <div class="col text-center py-5">
-                <a href="/createSesh" class="btn btn-lg btn-primary"
-                >Create a Sesh</a>
+            <div class="col py-5">
+                <div class="row">
+                    <div class="col text-center">
+                        <button class="btn btn-lg btn-primary"
+                        data-toggle="collapse" data-target="#createCollapsed"
+                        >Create a Sesh</button>
+                    </div>
+                </div>
+                <div class="row my-5 form-label-group collapse" id="createCollapsed">
+                    <div class="col text-center">
+                        <form method="POST" id="form-createSesh">
+                            <input type="text" id="name" required name="name"
+                            class="form-control">
+                            <label for="name" class="form-control-placeholder"
+                            >Sesh name</label>
+                            <button type="submit" class="btn btn-success my-3"
+                            >Create Sesh</button>
+                        </form>
+                    </div>
+                </div>
             </div>
             <div class="col text-center">
                 <h4>Sesh Invitations</h4>
@@ -71,13 +89,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% for (var i of user.eventList) { %>
+                        <% for (var i of user.inviteList) { %>
                             <tr>
                                 <th scope="row"><% i+1 %></th>
-                                <td><%= user.eventList[i].name %></td>
-                                <td><%= user.eventList[i].organizer.username %></td>
-                                <td><a href="/db/v1/seshes/<%= user.eventList[i]._id %>/acceptInvitation"
-                                    class="btn btn-success">Attend</a></td>
+                                <td><%= user.inviteList[i].name %></td>
+                                <td><%= user.inviteList[i].organizer.username %></td>
+                                <td><a href="/db/v1/seshes/<%= user.inviteList[i]._id %>/removeAttendee"
+                                    class="btn btn-danger">Leave Sesh</a></td>
                             </tr>
                         <% } %>
                     </tbody>

@@ -74,7 +74,8 @@ module.exports = {
 
     login: function(req, res) {
         let inc_user = req.body;
-        User.find({email: inc_user.emailL}, function(error, users) {
+        console.log(inc_user);
+        User.find({email: inc_user.email}, function(error, users) {
             if (error) {
                 console.log("There was an issue: ", error);
                 res.json(error);
@@ -88,7 +89,7 @@ module.exports = {
             } else if (users.length == 1) {
                 let user = users[0];
                 console.log("Single user found", user, inc_user);
-                bcrypt.compare(inc_user.passwordL, user.password)
+                bcrypt.compare(inc_user.password, user.password)
                 .then(result => {
                     console.log(result);
                     let response = {};
@@ -208,7 +209,6 @@ module.exports = {
     },
 
     renderHome: function(req, res) {
-        console.log(req.session);
         if (req.session.uid) {
             res.redirect('/dashboard');
         } else {
@@ -217,7 +217,6 @@ module.exports = {
     },
 
     renderSignUp: function(req, res) {
-        console.log(req.session);
         if (req.session.uid) {
             res.redirect('/dashboard');
         } else {
@@ -250,14 +249,16 @@ module.exports = {
                                 console.log("There was an issue: ", error);
                                 res.render('dashboard', error);
                             } else {
-                                user.inviteList = seshes;
+                                user.invitations = seshes;
                                 let events = user['events'];
                                 Sesh.find({_id: {$in: events}}, function(error, seshes) {
                                     if (error) {
                                         console.log("There was an issue: ", error);
                                         res.render('dashboard', error);
                                     } else {
-                                        user.eventList = seshes;
+                                        console.log("The sesh events are: ", seshes);
+                                        user.events = seshes;
+                                        console.log(user);
                                         response = {
                                             message: "Success",
                                             user: user
@@ -327,4 +328,28 @@ module.exports = {
         let sid = req.params.id;
         let uid = req.session.uid;
     },
+
+    deleteUserInfo: function(req, res) {
+        let uid = req.params.id;
+        let sid = req.body.sid;
+        User.update({_id: uid}, {$pull: {events: sid}}, function(error) {
+            if (error) {
+                console.log("There was an issue: ", error);
+                res.json(error);
+            } else {
+                User.find({_id: uid}, function(error, users) {
+                    if (error) {
+                        console.log("There was an issue: ", error);
+                        res.json(error);
+                    } else {
+                        let response = {
+                            message: "Success",
+                            user: users[0]
+                        };
+                        res.json(response);
+                    };
+                });
+            };
+        });
+    }
 }
